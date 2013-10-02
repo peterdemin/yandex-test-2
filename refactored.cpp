@@ -1,26 +1,19 @@
+/////////////////   refactored-start   ///////////////////////
+
 #include <string>
 #include <stdexcept>
 #include <iostream>
-#include <memory>
-#include <map>
 
-class CodeGenerator {
+class AbstractGenerator {
 public:
-    enum Lang {JAVA, C_PLUS_PLUS, PHP};
-    CodeGenerator(Lang language);
-    virtual std::string generateCode();
-    virtual std::string someCodeRelatedThing();
-    virtual ~CodeGenerator();
-protected:
-    CodeGenerator() {}
-private:
-    CodeGenerator *specific;
+    virtual std::string generateCode() = 0;
+    virtual std::string someCodeRelatedThing() = 0;
 };
 
-class JavaGenerator : public CodeGenerator {
+class JavaGenerator : public AbstractGenerator {
 public:
     std::string generateCode() {
-        return std::string("Java code") + someCodeRelatedThing();
+        return std::string("java code") + someCodeRelatedThing();
     }
 
     std::string someCodeRelatedThing() {
@@ -28,10 +21,10 @@ public:
     }
 };
 
-class CppGenerator : public CodeGenerator {
+class CppGenerator : public AbstractGenerator {
 public:
     std::string generateCode() {
-        return std::string("Cpp code") + someCodeRelatedThing();
+        return std::string("C++ code") + someCodeRelatedThing();
     }
 
     std::string someCodeRelatedThing() {
@@ -39,10 +32,10 @@ public:
     }
 };
 
-class PhpGenerator : public CodeGenerator {
+class PhpGenerator : public AbstractGenerator {
 public:
     std::string generateCode() {
-        return std::string("Php code") + someCodeRelatedThing();
+        return std::string("PHP code") + someCodeRelatedThing();
     }
 
     std::string someCodeRelatedThing() {
@@ -50,36 +43,40 @@ public:
     }
 };
 
-CodeGenerator::CodeGenerator(Lang language) {
-    switch(language) {
-        case JAVA:
-            specific = new JavaGenerator();
-            break;
-        case C_PLUS_PLUS:
-            specific = new CppGenerator();
-            break;
-        case PHP:
-            specific = new PhpGenerator();
-            break;
-        default:
-            specific = 0;
-            throw new std::logic_error("Bad language");
-            break;
+
+class CodeGenerator : public AbstractGenerator {
+public:
+    enum Lang {JAVA, C_PLUS_PLUS, PHP};
+    CodeGenerator(Lang language) {
+        switch(language) {
+            case JAVA:
+                specific = new JavaGenerator();
+                break;
+            case C_PLUS_PLUS:
+                specific = new CppGenerator();
+                break;
+            case PHP:
+                specific = new PhpGenerator();
+                break;
+            default:
+                specific = 0;
+                throw new std::logic_error("Bad language");
+                break;
+        }
     }
-}
+    virtual std::string generateCode(){
+        return specific->generateCode();
+    }
+    virtual std::string someCodeRelatedThing(){
+        return specific->someCodeRelatedThing();
+    }
+    ~CodeGenerator() {
+        delete specific;
+    }
 
-std::string CodeGenerator::generateCode() {
-    return specific->generateCode();
-}
-
-std::string CodeGenerator::someCodeRelatedThing() {
-    return specific->someCodeRelatedThing();
-}
-
-CodeGenerator::~CodeGenerator() {
-    delete specific;
-}
-
+private:
+    AbstractGenerator *specific;
+};
 
 int main() {
     CodeGenerator cg(CodeGenerator::C_PLUS_PLUS);
@@ -87,3 +84,5 @@ int main() {
     std::cout << cg.someCodeRelatedThing() << std::endl;
     return 0;
 }
+
+/////////////////   refactored-end   ///////////////////////
