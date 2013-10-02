@@ -1,4 +1,7 @@
+/////////////////   original-start   ///////////////////////
+
 #include <string>
+#include <iostream>
 #include <stdexcept>
 
 class CodeGenerator
@@ -9,9 +12,9 @@ public:
     std::string generateCode()
     {
         switch(_language) {
-            case JAVA: return std::string("java code");
-            case C_PLUS_PLUS: return std::string("C++ code");
-            case PHP: return std::string("PHP code");
+            case JAVA: return std::string("java code") + someCodeRelatedThing();
+            case C_PLUS_PLUS: return std::string("C++ code") + someCodeRelatedThing();
+            case PHP: return std::string("PHP code") + someCodeRelatedThing();
         }
         throw new std::logic_error("Bad language");
     }
@@ -32,5 +35,10 @@ private:
 
 
 int main() {
+    CodeGenerator cg(CodeGenerator::C_PLUS_PLUS);
+    std::cout << cg.generateCode() << std::endl;
+    std::cout << cg.someCodeRelatedThing() << std::endl;
     return 0;
 }
+
+/////////////////   original-end   ///////////////////////
